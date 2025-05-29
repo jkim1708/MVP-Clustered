@@ -1,9 +1,5 @@
-//only client
 "use client";
-
-import Image from "next/image";
-
-import {CandlestickSeries, createChart, LineSeries} from 'lightweight-charts'
+import {CandlestickSeries, createChart} from 'lightweight-charts'
 import {useEffect, useRef} from "react";
 
 function ChartComponent() {
