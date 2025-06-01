@@ -11,6 +11,8 @@ function ChartComponent() {
       const lineSeries = chart.addSeries(CandlestickSeries);
         lineSeries.applyOptions({
             priceScaleId: 'left',
+            priceLineVisible: false,
+            lastValueVisible: false,
             priceFormat: {
                 type: 'percent', // Display values as prices
                 precision: 1, // Number of decimal places
@@ -44,6 +46,8 @@ function ChartComponent() {
         customSeries.applyOptions({
             priceScaleId: 'right',
             lineVisible: false,
+            lastValueVisible: false,
+            priceLineVisible: false,
             priceFormat: {
                 type: 'percent', // Display values as prices
                 precision: 1, // Number of decimal places
@@ -79,6 +83,8 @@ function ChartComponent() {
         const lineSeries2 = chart.addSeries(CandlestickSeries);
         lineSeries2.applyOptions({
             priceScaleId: 'left',
+            lastValueVisible: false,
+            priceLineVisible: false,
         });
         lineSeries2.setData([
 
