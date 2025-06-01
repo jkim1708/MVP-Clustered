@@ -7,10 +7,7 @@ function ChartComponent() {
 
   useEffect(() => {
     if (chartContainerRef.current) {
-      const chart = createChart(chartContainerRef.current, { width: 400, height: 300, leftPriceScale: {visible: true, mode: 1,    priceFormat: {
-                  type: 'percent', // Display values as percentages
-                  precision: 2, // Number of decimal places
-              },} , rightPriceScale: {visible: true, mode: 1, } });
+      const chart = createChart(chartContainerRef.current, { width: 400, height: 300, leftPriceScale: {visible: true, mode: 1} , rightPriceScale: {visible: true, mode: 1, } });
       const lineSeries = chart.addSeries(CandlestickSeries);
         lineSeries.applyOptions({
             priceScaleId: 'left',
