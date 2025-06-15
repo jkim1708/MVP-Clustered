@@ -7,6 +7,12 @@ import Papa from 'papaparse';
 import createGarantieTopfLineSeries from "@/app/createGarantieTopfLineSeries";
 import createVermoegensTopfLineSeries from './createVermoegensTopfLineSeries';
 import createRestackLineSeries from './createRestackLineSeries';
+import {useDataContext} from "@/context/DataContext";
+import {Button} from "@/components/ui/button";
+import {BarChart3} from "lucide-react";
+import Router from "next/router";
+import {useRouter} from "next/navigation";
+import {router} from "next/client";
 
 //construct class
 
@@ -18,27 +24,15 @@ export type DataPoint = {
 
 function ChartComponent() {
     const chartContainerRef = useRef<HTMLDivElement>(null);
-    const [data, setData] = useState<DataPoint[]>([]); // Define state for parsed CSV data
+    const {data} = useDataContext();
+    const router = useRouter();
 
     useEffect(() => {
-        const csvFilePath = '/data.csv';
-
-        // CSV-Datei einlesen und parsen
-        fetch(csvFilePath)
-            .then((response) => response.text())
-            .then((csvText) => {
-                Papa.parse(csvText, {
-                    header: true, // Falls die CSV eine Kopfzeile hat
-                    skipEmptyLines: true,
-                    complete: (result) => {
-                        console.log('CSV parsing result:', result);
-                        setData(result.data as DataPoint[]); // Geparste Daten speichern
-
-                    },
-                });
-            });
-
-
+        if (data.length === 0) {
+            console.log('No data available to display chart.');
+            router.push('/csv-upload'); // Redirect to CSV upload page if no data
+            return;
+        }
     }, []);
 
     useEffect(() => {
@@ -63,17 +57,43 @@ function ChartComponent() {
         }
     }, [data]);
 
+
+
     return <div ref={chartContainerRef}/>;
 }
 
 export default function Home() {
-    return (
 
-    <div className="chart-wrapper" >
-    <div className="chart-container" >
-        < ChartComponent  />
-    </div>
-    </div>
-)
-    ;
+    const router = useRouter();
+
+    const handleCreateNewChart = () => {
+        router.push('/csv-upload'); // Navigate to chart creation or show chart options
+    }
+
+    return (
+        <div>
+            <div className="chart-wrapper">
+                <div className="chart-container">
+                    < ChartComponent/>
+                </div>
+
+            </div>
+            <div className="button-container">
+
+            <Button
+                variant="outline"
+                size="sm"
+                onClick={handleCreateNewChart}
+                className="flex items-center space-x-2"
+            >
+                <BarChart3 className="h-4 w-4" />
+                <span>Create New Chart</span>
+            </Button>
+            </div>
+
+        </div>
+
+
+    )
+        ;
 }
