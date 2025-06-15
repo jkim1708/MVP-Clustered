@@ -2,17 +2,14 @@
 import {
     createChart,
 } from 'lightweight-charts'
-import {useEffect, useRef, useState} from "react";
-import Papa from 'papaparse';
+import {useEffect, useRef} from "react";
 import createGarantieTopfLineSeries from "@/app/createGarantieTopfLineSeries";
 import createVermoegensTopfLineSeries from './createVermoegensTopfLineSeries';
 import createRestackLineSeries from './createRestackLineSeries';
 import {useDataContext} from "@/context/DataContext";
 import {Button} from "@/components/ui/button";
 import {BarChart3} from "lucide-react";
-import Router from "next/router";
 import {useRouter} from "next/navigation";
-import {router} from "next/client";
 
 //construct class
 

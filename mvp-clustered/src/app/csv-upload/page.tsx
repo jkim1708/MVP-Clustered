@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Upload, FileText, X } from "lucide-react"
 import {useDataContext} from "@/context/DataContext";
-import Papa, {ParseResult} from "papaparse";
+import Papa from "papaparse";
 import {DataPoint} from "@/app/page";
 import {useRouter} from "next/navigation";
 
