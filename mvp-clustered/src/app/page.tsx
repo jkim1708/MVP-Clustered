@@ -1,6 +1,6 @@
 "use client";
 import {
-    createChart,
+    createChart, UTCTimestamp,
 } from 'lightweight-charts'
 import {useEffect, useRef} from "react";
 import createGarantieTopfLineSeries from "@/app/createGarantieTopfLineSeries";
@@ -17,6 +17,12 @@ export type DataPoint = {
     DATE: string,
     EQUITY: number,
     BALANCE: number,
+}
+
+function timeConverter(time: string) {
+    const date = new Date(time);
+    const utcTimestamp = Math.floor(date.getTime() / 1000) as UTCTimestamp;
+    return utcTimestamp;
 }
 
 function ChartComponent() {
@@ -37,16 +43,33 @@ function ChartComponent() {
 
         if (chartContainerRef.current) {
             const chart = createChart(chartContainerRef.current, {
-                width: 400,
+                width: 1000,
                 height: 300,
                 leftPriceScale: {visible: true, mode: 1},
                 rightPriceScale: {visible: true, mode: 1,},
 
             });
 
+            // Adjust time range
+            const timeRange = {
+                // from: timeConverter(data[0]?.DATE),
+                // to: timeConverter(data[data.length - 1]?.DATE),
+                from: timeConverter(data[0]?.DATE), // Start date for the chart
+                to: timeConverter(data[5]?.DATE), // End date for the chart
+            };
+
+            console.log('Time range:', timeRange);
+            if(data[0]){
+                const TimesScale = chart.timeScale();
+                console.log('Setting time scale:', TimesScale);
+                TimesScale.fitContent();
+            }
+
             createGarantieTopfLineSeries(chart, data);
             createVermoegensTopfLineSeries(chart, data);
             createRestackLineSeries(chart);
+
+
 
             return () => {
                 chart.remove(); // Clean up the chart on component unmount
