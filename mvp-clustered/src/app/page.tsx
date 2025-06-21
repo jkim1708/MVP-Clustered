@@ -2,7 +2,7 @@
 import {
     createChart, UTCTimestamp,
 } from 'lightweight-charts'
-import {useEffect, useRef} from "react";
+import {useEffect, useRef, useState} from "react";
 import createGarantieTopfLineSeries from "@/app/createGarantieTopfLineSeries";
 import createVermoegensTopfLineSeries from './createVermoegensTopfLineSeries';
 import createRestackLineSeries from './createRestackLineSeries';
@@ -10,6 +10,9 @@ import {useDataContext} from "@/context/DataContext";
 import {Button} from "@/components/ui/button";
 import {BarChart3} from "lucide-react";
 import {useRouter} from "next/navigation";
+import Papa from "papaparse";
+import DatePicker from "react-datepicker";
+import {start} from "node:repl";
 
 //construct class
 
@@ -25,17 +28,28 @@ function timeConverter(time: string) {
     return utcTimestamp;
 }
 
-function ChartComponent() {
+function ChartComponent(chartComponentProps: { startDate: Date | null }) {
     const chartContainerRef = useRef<HTMLDivElement>(null);
-    const {data} = useDataContext();
-    const router = useRouter();
+    const {data,setData} = useDataContext();
 
     useEffect(() => {
-        if (data.length === 0) {
-            console.log('No data available to display chart.');
-            router.push('/csv-upload'); // Redirect to CSV upload page if no data
-            return;
-        }
+        const csvFilePath = '/data.csv';
+
+        // CSV-Datei einlesen und parsen
+        fetch(csvFilePath)
+            .then((response) => response.text())
+            .then((csvText) => {
+                Papa.parse(csvText, {
+                    header: true, // Falls die CSV eine Kopfzeile hat
+                    skipEmptyLines: true,
+                    complete: (result) => {
+                        console.log('CSV parsing result:', result);
+                        setData(result.data as DataPoint[]); // Geparste Daten speichern
+
+                    },
+                });
+            });
+
     }, []);
 
     useEffect(() => {
@@ -85,30 +99,59 @@ function ChartComponent() {
 export default function Home() {
 
     const router = useRouter();
+    const [startDate, setStartDate] = useState<Date | null>(new Date());
+    const datePickerRef = useRef<any>(null);
 
-    const handleCreateNewChart = () => {
-        router.push('/csv-upload'); // Navigate to chart creation or show chart options
-    }
 
+    let handleDateChange = (date: Date | null) => {
+        if (date) {
+            setStartDate(date);
+            const formattedDate = date.toISOString().split('T')[0]; // Format date as YYYY-MM-DD
+            console.log('Selected start date:', formattedDate);
+            // Here you can implement logic to filter or update the chart based on the selected date
+            // For example, you might want to fetch new data or adjust the chart's time range
+        }
+    };
+
+
+    const openDatePicker = () => {
+        if (datePickerRef.current) {
+            datePickerRef.current.setFocus();
+        }
+    };
     return (
         <div>
             <div className="chart-wrapper">
                 <div className="chart-container">
-                    < ChartComponent/>
+                    <ChartComponent startDate={startDate}/>
                 </div>
 
             </div>
             <div className="button-container">
 
-            <Button
-                variant="outline"
-                size="sm"
-                onClick={handleCreateNewChart}
-                className="flex items-center space-x-2"
-            >
-                <BarChart3 className="h-4 w-4" />
-                <span>Create New Chart</span>
-            </Button>
+                {/*<div>*/}
+                {/*    <div className="datepicker-container">*/}
+                {/*        <label htmlFor="start-date">Select Start Date:</label>*/}
+                {/*        <DatePicker*/}
+                {/*            id="start-date"*/}
+                {/*            selected={startDate}*/}
+                {/*            onChange={handleDateChange}*/}
+                {/*            dateFormat="yyyy-MM-dd"*/}
+                {/*            ref={datePickerRef}*/}
+                {/*        />*/}
+                {/*    </div>*/}
+                {/*    /!* Chart rendering logic *!/*/}
+                {/*</div>*/}
+
+
+                <Button
+                    variant="outline"
+                    size="sm"
+                    className="flex items-center space-x-2"
+                >
+                    <BarChart3 className="h-4 w-4"/>
+                    <a href={"/data.csv"}><span>Download CSV</span></a>
+                </Button>
             </div>
 
         </div>
