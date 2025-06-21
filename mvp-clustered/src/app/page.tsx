@@ -2,17 +2,14 @@
 import {
     createChart, UTCTimestamp,
 } from 'lightweight-charts'
-import {useEffect, useRef, useState} from "react";
+import {useEffect, useRef} from "react";
 import createGarantieTopfLineSeries from "@/app/createGarantieTopfLineSeries";
 import createVermoegensTopfLineSeries from './createVermoegensTopfLineSeries';
 import createRestackLineSeries from './createRestackLineSeries';
 import {useDataContext} from "@/context/DataContext";
 import {Button} from "@/components/ui/button";
 import {BarChart3} from "lucide-react";
-import {useRouter} from "next/navigation";
 import Papa from "papaparse";
-import DatePicker from "react-datepicker";
-import {start} from "node:repl";
 
 //construct class
 
@@ -28,7 +25,7 @@ function timeConverter(time: string) {
     return utcTimestamp;
 }
 
-function ChartComponent(chartComponentProps: { startDate: Date | null }) {
+function ChartComponent() {
     const chartContainerRef = useRef<HTMLDivElement>(null);
     const {data,setData} = useDataContext();
 
@@ -98,32 +95,11 @@ function ChartComponent(chartComponentProps: { startDate: Date | null }) {
 
 export default function Home() {
 
-    const router = useRouter();
-    const [startDate, setStartDate] = useState<Date | null>(new Date());
-    const datePickerRef = useRef<any>(null);
-
-
-    let handleDateChange = (date: Date | null) => {
-        if (date) {
-            setStartDate(date);
-            const formattedDate = date.toISOString().split('T')[0]; // Format date as YYYY-MM-DD
-            console.log('Selected start date:', formattedDate);
-            // Here you can implement logic to filter or update the chart based on the selected date
-            // For example, you might want to fetch new data or adjust the chart's time range
-        }
-    };
-
-
-    const openDatePicker = () => {
-        if (datePickerRef.current) {
-            datePickerRef.current.setFocus();
-        }
-    };
     return (
         <div>
             <div className="chart-wrapper">
                 <div className="chart-container">
-                    <ChartComponent startDate={startDate}/>
+                    <ChartComponent />
                 </div>
 
             </div>
