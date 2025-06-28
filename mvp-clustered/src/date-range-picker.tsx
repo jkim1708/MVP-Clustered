@@ -25,7 +25,7 @@ export default function DateRangePicker() {
 
     return (
         // <div className="min-h-screen w-full relative overflow-hidden">
-        <div className="w-full mt-70 mb-1">
+        <div className="w-full mt-1 mb-1">
         {/*<div className="">*/}
             {/* Fluid Blue Background */}
             <div
