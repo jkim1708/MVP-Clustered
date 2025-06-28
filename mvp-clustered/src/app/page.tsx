@@ -26,8 +26,17 @@ function timeConverter(time: string) {
     return utcTimestamp;
 }
 
+function findDateInData(data: DataPoint[], time: number & { [Symbol.species]: "UTCTimestamp" }) {
+    return data.findIndex((item) => {
+        const itemTime = timeConverter(item.DATE);
+        console.log('itemTime:', itemTime, 'from:', time);
+        return itemTime >= time;
+    });
+}
+
 function ChartComponent() {
     const chartContainerRef = useRef<HTMLDivElement>(null);
+    const [rootData, setRootData] = useState<DataPoint[] | undefined>();
     const [data, setData] = useState<DataPoint[] | undefined>();
     const {startDate, endDate} = useDataContext();
 
@@ -43,6 +52,7 @@ function ChartComponent() {
                     skipEmptyLines: true,
                     complete: (result) => {
                         console.log('CSV parsing result:', result);
+                        setRootData(result.data as DataPoint[]); // Geparste Daten speichern
                         setData(result.data as DataPoint[]); // Geparste Daten speichern
 
                     },
@@ -72,24 +82,8 @@ function ChartComponent() {
                 createGarantieTopfLineSeries(chart, data);
                 createVermoegensTopfLineSeries(chart, data);
                 createRestackLineSeries(chart);
-
-                if( startDate && endDate) {
-                    const timeRange = {
-                        from: timeConverter(startDate.toISOString() || ''), // Start date for the chart
-                        to: timeConverter(endDate.toISOString() || ''), // End date for the chart
-                        // from: timeConverter('2025-12-05T00:00:00Z'),
-                        // to: timeConverter('2025-12-15T23:59:59Z'),
-                    };
-                    console.log('Time range:', timeRange);
-                    console.log('chart timescale', chart.timeScale());
-                    chart.timeScale().setVisibleRange(timeRange);
-                } else {
-                    // if (data[0]) {
-                    //     const TimesScale = chart.timeScale();
-                    //     console.log('Setting time scale:', TimesScale);
-                    //     TimesScale.fitContent();
-                    // }
-                }
+                    const TimesScale = chart.timeScale();
+                    TimesScale.fitContent();
 
             }
 
@@ -98,7 +92,33 @@ function ChartComponent() {
                 chart.remove(); // Clean up the chart on component unmount
             };
         }
-    }, [data, startDate, endDate]);
+    }, [data]);
+
+    useEffect(() => {
+
+        if( startDate && endDate && data && rootData) {
+            const timeRange = {
+                from: timeConverter(startDate.toISOString() || ''), // Start date for the chart
+                to: timeConverter(endDate.toISOString() || ''), // End date for the chart
+            };
+            console.log('Time range:', timeRange);
+
+            const foundStartIndex= findDateInData(rootData, timeRange.from);
+            const foundEndIndex= findDateInData(rootData, timeRange.to);
+
+            setData(rootData?.slice(foundStartIndex, foundEndIndex + 1));
+
+
+        } else {
+            // if (data[0]) {
+            //     const TimesScale = chart.timeScale();
+            //     console.log('Setting time scale:', TimesScale);
+            //     TimesScale.fitContent();
+            // }
+        }
+    }, [startDate, endDate]);
+
+
 
     return <div ref={chartContainerRef}/>;
 }
