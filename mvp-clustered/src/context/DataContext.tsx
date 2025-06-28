@@ -2,19 +2,21 @@
 
 import { createContext, useContext, useState } from "react";
 import type { ReactNode } from "react";
-import type { DataPoint } from "@/app/page";
 
-type DataContextType = {
-    data: DataPoint[];
-    setData: (data: DataPoint[]) => void;
+type DateRangeContextType = {
+    startDate: Date | null;
+    setStartDate: (data: Date | null) => void;
+    endDate: Date | null;
+    setEndDate: (data: Date | null) => void;
 };
 
-const DataContext = createContext<DataContextType | undefined>(undefined);
+const DataContext = createContext<DateRangeContextType | undefined>(undefined);
 
 export function DataProvider({ children }: { children: ReactNode }) {
-    const [data, setData] = useState<DataPoint[]>([]);
+    const [startDate, setStartDate] = useState<Date | null>(new Date());
+    const [endDate, setEndDate] = useState<Date | null>(new Date());
     return (
-        <DataContext.Provider value={{ data, setData }}>
+        <DataContext.Provider value={{startDate, setStartDate,endDate, setEndDate}}>
             {children}
         </DataContext.Provider>
     );

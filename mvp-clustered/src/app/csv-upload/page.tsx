@@ -6,9 +6,7 @@ import { useState, useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Upload, FileText, X } from "lucide-react"
-import {useDataContext} from "@/context/DataContext";
 import Papa from "papaparse";
-import {DataPoint} from "@/app/page";
 import {useRouter} from "next/navigation";
 
 export default function Component() {
@@ -18,7 +16,7 @@ export default function Component() {
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const router = useRouter();
 
-    const {setData} = useDataContext(); // Assuming you have a DataContext to set the data
+    // const [setData] = useState(); // Assuming you have a DataContext to set the data
 
     const handleFileSelect = (file: File) => {
         if (file.type === "text/csv" || file.name.endsWith(".csv")) {
@@ -78,7 +76,7 @@ export default function Component() {
                 complete: (result) => {
                     console.log('CSV parsing resultt:', result);
                     errors = result.errors.map(error => error.message);
-                    setData(result.data as DataPoint[]); // Geparste Daten speichern
+                    // setData(result.data as DataPoint[]); // Geparste Daten speichern
 
                 },
             });

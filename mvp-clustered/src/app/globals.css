@@ -54,14 +54,15 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 80vh; /* Full viewport height */
-  width: 100vw; /* Full viewport width */
+  /*height: 80vh; !* Full viewport height *!*/
+  /*width: 100vw; !* Full viewport width *!*/
 }
 
 .chart-wrapper > div {
   border-radius: 15px; /* Adjust the value for desired roundness */
   overflow: hidden; /* Ensures content stays within rounded corners */
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Optional: Add a shadow for better appearance */
+  z-index: 100;
 }
 .chart-container {
   padding: 20px; /* Add padding around the chart */
@@ -69,7 +70,19 @@ body {
   background-color: #fff; /* Optional: Add a background color */
   border-radius: 10px; /* Optional: Add rounded corners */
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Optional: Add a shadow */
+  z-index: 50;
 }
+
+.tradingview-widget-container {
+  z-index: 100; /* Lower z-index for the chart container */
+  position: relative; /* Ensure proper stacking context */
+}
+
+.datepicker-popper {
+  position:relative;
+  z-index: 1050; /* Ensure it is higher than the chart's z-index */
+}
+
 
 .styled-input {
   width: 300px;

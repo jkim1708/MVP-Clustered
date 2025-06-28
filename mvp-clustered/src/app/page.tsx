@@ -2,14 +2,15 @@
 import {
     createChart, UTCTimestamp,
 } from 'lightweight-charts'
-import {useEffect, useRef} from "react";
+import {useEffect, useRef, useState} from "react";
 import createGarantieTopfLineSeries from "@/app/createGarantieTopfLineSeries";
 import createVermoegensTopfLineSeries from './createVermoegensTopfLineSeries';
 import createRestackLineSeries from './createRestackLineSeries';
-import {useDataContext} from "@/context/DataContext";
 import {Button} from "@/components/ui/button";
 import {BarChart3} from "lucide-react";
 import Papa from "papaparse";
+import DateRangePicker from "@/date-range-picker";
+import {useDataContext} from "@/context/DataContext";
 
 //construct class
 
@@ -27,7 +28,8 @@ function timeConverter(time: string) {
 
 function ChartComponent() {
     const chartContainerRef = useRef<HTMLDivElement>(null);
-    const {data,setData} = useDataContext();
+    const [data, setData] = useState<DataPoint[] | undefined>();
+    const {startDate, endDate} = useDataContext();
 
     useEffect(() => {
         const csvFilePath = '/data.csv';
@@ -58,37 +60,45 @@ function ChartComponent() {
                 height: 300,
                 leftPriceScale: {visible: true, mode: 1},
                 rightPriceScale: {visible: true, mode: 1,},
-
             });
 
             // Adjust time range
-            const timeRange = {
-                // from: timeConverter(data[0]?.DATE),
-                // to: timeConverter(data[data.length - 1]?.DATE),
-                from: timeConverter(data[0]?.DATE), // Start date for the chart
-                to: timeConverter(data[5]?.DATE), // End date for the chart
-            };
 
-            console.log('Time range:', timeRange);
-            if(data[0]){
-                const TimesScale = chart.timeScale();
-                console.log('Setting time scale:', TimesScale);
-                TimesScale.fitContent();
+            console.log('has run');
+
+
+            if (data) {
+
+                createGarantieTopfLineSeries(chart, data);
+                createVermoegensTopfLineSeries(chart, data);
+                createRestackLineSeries(chart);
+
+                if( startDate && endDate) {
+                    const timeRange = {
+                        from: timeConverter(startDate.toISOString() || ''), // Start date for the chart
+                        to: timeConverter(endDate.toISOString() || ''), // End date for the chart
+                        // from: timeConverter('2025-12-05T00:00:00Z'),
+                        // to: timeConverter('2025-12-15T23:59:59Z'),
+                    };
+                    console.log('Time range:', timeRange);
+                    console.log('chart timescale', chart.timeScale());
+                    chart.timeScale().setVisibleRange(timeRange);
+                } else {
+                    // if (data[0]) {
+                    //     const TimesScale = chart.timeScale();
+                    //     console.log('Setting time scale:', TimesScale);
+                    //     TimesScale.fitContent();
+                    // }
+                }
+
             }
-
-            createGarantieTopfLineSeries(chart, data);
-            createVermoegensTopfLineSeries(chart, data);
-            createRestackLineSeries(chart);
-
 
 
             return () => {
                 chart.remove(); // Clean up the chart on component unmount
             };
         }
-    }, [data]);
-
-
+    }, [data, startDate, endDate]);
 
     return <div ref={chartContainerRef}/>;
 }
@@ -97,12 +107,20 @@ export default function Home() {
 
     return (
         <div>
+            <div className="datepicker-popper">
+            <DateRangePicker/>
+            </div>
             <div className="chart-wrapper">
+
+
                 <div className="chart-container">
-                    <ChartComponent />
+
+                    <ChartComponent/>
                 </div>
 
+
             </div>
+
             <div className="button-container">
 
                 {/*<div>*/}
